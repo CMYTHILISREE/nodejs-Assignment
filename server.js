@@ -15,6 +15,19 @@ const users =[
         lastName: "Agarwal", 
         hobby: "Teaching",
     },
+    {
+        id: "2", 
+        firstName: "Mythili", 
+        lastName: "C", 
+        hobby: "Music",
+    },
+    {
+        id: "3", 
+        firstName: "Ajay", 
+        lastName: "Anish", 
+        hobby: "Games",
+    },
+
   
 ];
 
@@ -26,9 +39,9 @@ app.use((req, res, next) => {
 
 // Middleware for CheckDetails
 const checkUser = (req, res, next) => {
-    const { id, firstName, lastName, hobby } = req.body;
-    if (!id || !firstName || !lastName || !hobby) {
-        return res.status(400).json({ error: 'All fields are required: id, firstName, lastName, hobby' });
+    const { firstName, lastName, hobby } = req.body;
+    if (!firstName || !lastName || !hobby) {
+        return res.status(400).json({ error: 'All fields are required: firstName, lastName, hobby' });
     }
     next();
 };
@@ -53,7 +66,7 @@ app.get("/users/:id",(req,res)=>{
 
 //Add a new User
 app.post("/user",checkUser,(req,res)=>{
-      const { id, firstName, lastName, hobby } = req.body;
+      const { firstName, lastName, hobby } = req.body;
 
     const userExists = users.find(user => user.id === id);
     if (userExists) {
@@ -61,7 +74,7 @@ app.post("/user",checkUser,(req,res)=>{
     }
 
     const newUser = { 
-        id:id,
+        id: (users.length + 1).toString(),
         firstName:firstName, 
         lastName:lastName, 
         hobby:hobby,
@@ -73,25 +86,29 @@ app.post("/user",checkUser,(req,res)=>{
 
 //Update details of an existing user
 app.put("/user/:id", checkUser,(req,res)=>{
+    const { firstName, lastName, hobby } = req.body;
     const userId = req.params.id;
-    const user = users.find(user=>user.id == userId);
+    const user = users.find(user=>user.id === userId);
     if(!user){
         return res.status(404).json({message:"user not found"});
     }
-    const { firstName, lastName, hobby } = req.body;
-    Object.assign(user, { firstName, lastName, hobby });
-    res.status(200).json(users);
+   
+    user.firstName = firstName;
+    user.lastName = lastName;
+    user.hobby = hobby;
+
+    res.status(200).json(user);
 });
 
 //Delete a user by id
 app.delete("/user/:id",(req,res)=>{
     const userId = req.params.id;
-    const user = users.find(user => user.id == userId);
+    const user = users.find(user => user.id === userId);
     if(!user){
         return res.status(404).json({message:"user not found"});
     }
     const filtereduser = users.filter(user => user.id != userId);
-    res.status(200).json({ message: 'User deleted successfully' });
+    res.status(200).json({ message: 'User deleted successfully'});
 });
 
 // Global error handling middleware
